@@ -40,6 +40,7 @@
     .logo-container {
       text-align: center;
       margin-bottom: 20px;
+      padding: 10px 0;
     }
     
     .logo {
@@ -49,6 +50,9 @@
       border: 2px solid #00ff6a;
       box-shadow: 0 0 15px rgba(0, 255, 106, 0.4);
       margin-bottom: 15px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
     
     .sidebar h1 {
@@ -339,31 +343,145 @@
     
     /* RESPONSIVE */
     @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+      }
+      
+      .container {
+        flex-direction: column;
+      }
+      
       .sidebar {
         width: 100%;
         height: auto;
         position: relative;
         border-right: none;
         border-bottom: 2px solid #00ff6a;
+        padding: 15px;
+      }
+      
+      .logo {
+        max-width: 120px;
+      }
+      
+      .sidebar h1 {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+      
+      .categoria-item {
+        padding: 10px 12px;
+        font-size: 12px;
+        margin-bottom: 8px;
       }
       
       .content {
         margin-left: 0;
         width: 100%;
-        padding: 20px;
+        padding: 15px;
+      }
+      
+      .header h2 {
+        font-size: 20px;
       }
       
       .productos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 15px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        padding: 5px;
+      }
+      
+      .producto-card {
+        padding: 10px;
+      }
+      
+      .producto-imagen {
+        height: 150px;
+      }
+      
+      .producto-nombre {
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+      
+      .producto-precio {
+        font-size: 16px;
+      }
+      
+      /* MODAL MÓVIL */
+      .modal {
+        padding: 10px;
+      }
+      
+      .modal-content {
+        padding: 20px;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      .modal-close {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+        top: 10px;
+        right: 10px;
       }
       
       .carrusel-imagen {
-        height: 300px;
+        height: 250px;
+      }
+      
+      .carrusel-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+      }
+      
+      .carrusel-btn.prev {
+        left: 5px;
+      }
+      
+      .carrusel-btn.next {
+        right: 5px;
+      }
+      
+      .modal-info h2 {
+        font-size: 20px;
+        margin-bottom: 12px;
       }
       
       .modal-info-grid {
         grid-template-columns: 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      
+      .info-item {
+        padding: 10px;
+      }
+      
+      .info-item span {
+        font-size: 11px;
+      }
+      
+      .modal-descripcion {
+        padding: 15px;
+        font-size: 14px;
+      }
+    }
+    
+    /* MÓVILES PEQUEÑOS */
+    @media (max-width: 480px) {
+      .productos-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .producto-imagen {
+        height: 200px;
+      }
+      
+      .carrusel-imagen {
+        height: 200px;
       }
     }
   </style>
@@ -427,9 +545,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
     // ==========================================
-    // CONFIGURACIÓN - PEGA AQUÍ TU URL DE GOOGLE SHEETS
+    // CONFIGURACIÓN - URL DE GOOGLE SHEETS
     // ==========================================
-    const GOOGLE_SHEETS_CSV_URL = 'TU_URL_CSV_AQUI';
+    const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRPUWhi-2KnyI2y87yZtvxP8kdhizO7YGzEhJc5oDL5Iq-tMJecXa9J_1dNKGVUe13LZ6VjdIWiga3B/pub?gid=1827384092&single=true&output=csv';
     
     // Variables globales
     let todosLosProductos = [];
