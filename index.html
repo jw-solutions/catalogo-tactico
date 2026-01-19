@@ -563,26 +563,39 @@
     // CARGAR DATOS DESDE GOOGLE SHEETS
     // ==========================================
     function cargarDatosDesdeSheets() {
+      console.log('🔄 Iniciando carga de datos...');
+      console.log('📍 URL CSV:', GOOGLE_SHEETS_CSV_URL);
+      
       Papa.parse(GOOGLE_SHEETS_CSV_URL, {
         download: true,
         header: true,
         complete: function(results) {
+          console.log('✅ Datos recibidos:', results.data.length, 'filas');
+          console.log('📋 Primera fila:', results.data[0]);
           procesarDatos(results.data);
         },
         error: function(error) {
-          console.error('Error al cargar:', error);
+          console.error('❌ Error al cargar:', error);
           document.getElementById('productos-container').innerHTML = 
-            '<div class="loader">ERROR AL CARGAR DATOS</div>';
+            '<div class="loader">ERROR: No se pudo cargar el catálogo. Verifica la consola (F12)</div>';
+          document.getElementById('categorias-menu').innerHTML = 
+            '<div class="loader">ERROR DE CARGA</div>';
         }
       });
     }
     
     function procesarDatos(datos) {
+      console.log('🔄 Procesando', datos.length, 'filas...');
       const productos = {};
+      let procesados = 0;
       
       // Agrupar productos por nombre + color
       datos.forEach(row => {
-        if (!row['Nombre del artículo'] || !row['Categoría']) return;
+        // Validar que tenga al menos nombre y categoría
+        if (!row['Nombre del artículo'] || !row['Categoría']) {
+          console.log('⚠️ Fila sin nombre o categoría, saltando:', row);
+          return;
+        }
         
         const key = row['Nombre del artículo'] + '_' + (row['Color'] || '');
         
@@ -605,6 +618,7 @@
             url: row['Imagen (URL Drive)']
           });
         }
+        procesados++;
       });
       
       // Convertir a array y ordenar imágenes
@@ -612,6 +626,17 @@
       todosLosProductos.forEach(p => {
         p.imagenes.sort((a, b) => a.numero - b.numero);
       });
+      
+      console.log('✅ Productos procesados:', todosLosProductos.length);
+      console.log('📦 Primer producto:', todosLosProductos[0]);
+      
+      if (todosLosProductos.length === 0) {
+        document.getElementById('productos-container').innerHTML = 
+          '<div class="loader">⚠️ No se encontraron productos válidos. Verifica los nombres de las columnas en Google Sheets.</div>';
+        document.getElementById('categorias-menu').innerHTML = 
+          '<div class="loader">SIN DATOS</div>';
+        return;
+      }
       
       cargarCategorias();
       mostrarProductos(todosLosProductos);
@@ -626,10 +651,12 @@
       
       let html = '<div class="categoria-item active" onclick="filtrarPorCategoria(\'TODOS\')">🎯 TODOS</div>';
       categorias.forEach(cat => {
-        html += `<div class="categoria-item" onclick="filtrarPorCategoria('${cat}')">${cat}</div>`;
+        const catEscapada = cat.replace(/'/g, "\\'");
+        html += `<div class="categoria-item" onclick="filtrarPorCategoria('${catEscapada}')">${cat}</div>`;
       });
       
       menu.innerHTML = html;
+      console.log('✅ Categorías cargadas:', categorias.length);
     }
     
     function filtrarPorCategoria(categoria) {
@@ -662,17 +689,19 @@
       let html = '';
       productos.forEach((producto, index) => {
         const img = producto.imagenes[0]?.url || '';
+        const nombreSeguro = producto.nombre.replace(/'/g, '&#39;');
         html += `
-          <div class="producto-card" onclick='abrirModal(${index})'>
-            <img src="${img}" alt="${producto.nombre}" class="producto-imagen" 
+          <div class="producto-card" onclick="abrirModal(${index})">
+            <img src="${img}" alt="${nombreSeguro}" class="producto-imagen" 
                  onerror="this.src='https://via.placeholder.com/280x220/0a0a0a/00ff6a?text=Sin+Imagen'">
             <div class="producto-nombre">${producto.nombre}</div>
-            <div class="producto-precio">$${formatearPrecio(producto.precio)}</div>
+            <div class="producto-precio">${formatearPrecio(producto.precio)}</div>
           </div>
         `;
       });
       
       container.innerHTML = html;
+      console.log('✅ Productos mostrados:', productos.length);
     }
     
     // ==========================================
