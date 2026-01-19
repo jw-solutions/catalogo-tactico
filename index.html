@@ -37,6 +37,20 @@
       z-index: 100;
     }
     
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .logo {
+      max-width: 180px;
+      width: 100%;
+      height: auto;
+      border: 2px solid #00ff6a;
+      box-shadow: 0 0 15px rgba(0, 255, 106, 0.4);
+      margin-bottom: 15px;
+    }
+    
     .sidebar h1 {
       color: #00ff6a;
       font-size: 24px;
@@ -358,6 +372,9 @@
   
   <div class="container">
     <aside class="sidebar">
+      <div class="logo-container">
+        <img src="https://lh3.googleusercontent.com/d/19CNb_A7d7Ebu_z9wXRE1dotgOZDsKeiG" alt="Logo" class="logo">
+      </div>
       <h1>⚡ CATÁLOGO TÁCTICO ⚡</h1>
       <div id="categorias-menu">
         <div class="loader">CARGANDO CATEGORÍAS</div>
@@ -397,12 +414,8 @@
             <span>CATEGORÍA</span>
             <div id="modal-categoria"></div>
           </div>
-          <div class="info-item">
-            <span>COSTO</span>
-            <div id="modal-costo"></div>
-          </div>
-          <div class="info-item">
-            <span>PRECIO VENTA</span>
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <span>PRECIO</span>
             <div id="modal-precio"></div>
           </div>
         </div>
@@ -416,7 +429,7 @@
     // ==========================================
     // CONFIGURACIÓN - PEGA AQUÍ TU URL DE GOOGLE SHEETS
     // ==========================================
-    const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRPUWhi-2KnyI2y87yZtvxP8kdhizO7YGzEhJc5oDL5Iq-tMJecXa9J_1dNKGVUe13LZ6VjdIWiga3B/pub?gid=1827384092&single=true&output=csv';
+    const GOOGLE_SHEETS_CSV_URL = 'TU_URL_CSV_AQUI';
     
     // Variables globales
     let todosLosProductos = [];
@@ -554,8 +567,80 @@
       document.getElementById('modal-nombre').textContent = productoActual.nombre;
       document.getElementById('modal-color').textContent = productoActual.color;
       document.getElementById('modal-categoria').textContent = productoActual.categoria;
-      document.getElementById('modal-costo').textContent = '$' + formatearPrecio(productoActual.costo);
-      document.getElementById('modal-precio').textContent = '$' + formatearPrecio(productoActual.precio);
+      document.getElementById('modal-precio').textContent = '
+      
+      actualizarCarrusel();
+      crearIndicadores();
+      
+      document.getElementById('modal').classList.add('active');
+    }
+    
+    function cerrarModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+    
+    function cambiarImagen(direccion) {
+      if (!productoActual) return;
+      
+      imagenActualIndex += direccion;
+      
+      if (imagenActualIndex < 0) {
+        imagenActualIndex = productoActual.imagenes.length - 1;
+      } else if (imagenActualIndex >= productoActual.imagenes.length) {
+        imagenActualIndex = 0;
+      }
+      
+      actualizarCarrusel();
+    }
+    
+    function irAImagen(index) {
+      imagenActualIndex = index;
+      actualizarCarrusel();
+    }
+    
+    function actualizarCarrusel() {
+      if (!productoActual || !productoActual.imagenes[imagenActualIndex]) return;
+      
+      document.getElementById('carrusel-imagen').src = productoActual.imagenes[imagenActualIndex].url;
+      
+      document.querySelectorAll('.indicador').forEach((ind, i) => {
+        ind.classList.toggle('active', i === imagenActualIndex);
+      });
+    }
+    
+    function crearIndicadores() {
+      const container = document.getElementById('carrusel-indicadores');
+      let html = '';
+      
+      productoActual.imagenes.forEach((img, i) => {
+        html += `<span class="indicador ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})"></span>`;
+      });
+      
+      container.innerHTML = html;
+    }
+    
+    // ==========================================
+    // UTILIDADES
+    // ==========================================
+    function formatearPrecio(precio) {
+      return Number(precio).toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+    
+    // Cerrar modal con ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') cerrarModal();
+    });
+    
+    // Cerrar modal al hacer click fuera
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal();
+    });
+  </script>
+</body>
+</html> + formatearPrecio(productoActual.precio);
       document.getElementById('modal-descripcion').textContent = productoActual.descripcion;
       
       actualizarCarrusel();
