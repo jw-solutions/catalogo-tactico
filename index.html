@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo Táctico</title>
+  <title>Catalogo Tactico</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   
   <style>
@@ -25,7 +25,6 @@
       min-height: 100vh;
     }
     
-    /* MENÚ LATERAL */
     .sidebar {
       width: 280px;
       background-color: #000000;
@@ -91,7 +90,6 @@
       box-shadow: 0 0 15px rgba(0, 255, 106, 0.5);
     }
     
-    /* CONTENIDO */
     .content {
       margin-left: 280px;
       padding: 30px;
@@ -110,7 +108,6 @@
       text-shadow: 0 0 10px rgba(0, 255, 106, 0.5);
     }
     
-    /* GRILLA DE PRODUCTOS */
     .productos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -174,7 +171,6 @@
       text-shadow: 0 0 10px rgba(0, 255, 106, 0.3);
     }
     
-    /* MODAL */
     .modal {
       display: none;
       position: fixed;
@@ -224,7 +220,6 @@
       transform: rotate(90deg);
     }
     
-    /* CARRUSEL */
     .carrusel-container {
       position: relative;
       margin-bottom: 25px;
@@ -281,7 +276,6 @@
       box-shadow: 0 0 10px rgba(0, 255, 106, 0.8);
     }
     
-    /* INFO PRODUCTO */
     .modal-info h2 {
       color: #00ff6a;
       font-size: 26px;
@@ -313,6 +307,10 @@
       opacity: 0.8;
     }
     
+    .info-precio-full {
+      grid-column: 1 / -1;
+    }
+    
     .modal-descripcion {
       background-color: #0a0a0a;
       border: 2px solid #00ff6a;
@@ -321,7 +319,6 @@
       color: #ffffff;
     }
     
-    /* LOADER */
     .loader {
       text-align: center;
       padding: 50px;
@@ -341,7 +338,6 @@
       60%, 100% { content: '...'; }
     }
     
-    /* RESPONSIVE */
     @media (max-width: 768px) {
       body {
         overflow-x: hidden;
@@ -408,7 +404,6 @@
         font-size: 16px;
       }
       
-      /* MODAL MÓVIL */
       .modal {
         padding: 10px;
       }
@@ -470,7 +465,6 @@
       }
     }
     
-    /* MÓVILES PEQUEÑOS */
     @media (max-width: 480px) {
       .productos-grid {
         grid-template-columns: 1fr;
@@ -493,9 +487,9 @@
       <div class="logo-container">
         <img src="https://lh3.googleusercontent.com/d/19CNb_A7d7Ebu_z9wXRE1dotgOZDsKeiG" alt="Logo" class="logo">
       </div>
-      <h1>⚡ CATÁLOGO TÁCTICO ⚡</h1>
+      <h1>CATALOGO TACTICO</h1>
       <div id="categorias-menu">
-        <div class="loader">CARGANDO CATEGORÍAS</div>
+        <div class="loader">CARGANDO CATEGORIAS</div>
       </div>
     </aside>
     
@@ -512,12 +506,12 @@
   
   <div id="modal" class="modal">
     <div class="modal-content">
-      <button class="modal-close" onclick="cerrarModal()">×</button>
+      <button class="modal-close" id="btn-cerrar">×</button>
       
       <div class="carrusel-container">
         <img id="carrusel-imagen" class="carrusel-imagen" src="" alt="Producto">
-        <button class="carrusel-btn prev" onclick="cambiarImagen(-1)">‹</button>
-        <button class="carrusel-btn next" onclick="cambiarImagen(1)">›</button>
+        <button class="carrusel-btn prev" id="btn-prev">&lt;</button>
+        <button class="carrusel-btn next" id="btn-next">&gt;</button>
         <div id="carrusel-indicadores" class="carrusel-indicadores"></div>
       </div>
       
@@ -529,10 +523,10 @@
             <div id="modal-color"></div>
           </div>
           <div class="info-item">
-            <span>CATEGORÍA</span>
+            <span>CATEGORIA</span>
             <div id="modal-categoria"></div>
           </div>
-          <div class="info-item" style="grid-column: 1 / -1;">
+          <div class="info-item info-precio-full">
             <span>PRECIO</span>
             <div id="modal-precio"></div>
           </div>
@@ -544,40 +538,44 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    // ==========================================
-    // CONFIGURACIÓN - URL DE GOOGLE SHEETS
-    // ==========================================
-    const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRPUWhi-2KnyI2y87yZtvxP8kdhizO7YGzEhJc5oDL5Iq-tMJecXa9J_1dNKGVUe13LZ6VjdIWiga3B/pub?gid=1827384092&single=true&output=csv';
+    var GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRPUWhi-2KnyI2y87yZtvxP8kdhizO7YGzEhJc5oDL5Iq-tMJecXa9J_1dNKGVUe13LZ6VjdIWiga3B/pub?gid=1827384092&single=true&output=csv';
     
-    // Variables globales
-    let todosLosProductos = [];
-    let productoActual = null;
-    let imagenActualIndex = 0;
+    var todosLosProductos = [];
+    var productoActual = null;
+    var imagenActualIndex = 0;
     
-    // Inicializar al cargar
     window.onload = function() {
       cargarDatosDesdeSheets();
+      
+      document.getElementById('btn-cerrar').onclick = cerrarModal;
+      document.getElementById('btn-prev').onclick = function() { cambiarImagen(-1); };
+      document.getElementById('btn-next').onclick = function() { cambiarImagen(1); };
+      
+      document.getElementById('modal').onclick = function(e) {
+        if (e.target === this) cerrarModal();
+      };
+      
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') cerrarModal();
+      });
     };
     
-    // ==========================================
-    // CARGAR DATOS DESDE GOOGLE SHEETS
-    // ==========================================
     function cargarDatosDesdeSheets() {
-      console.log('🔄 Iniciando carga de datos...');
-      console.log('📍 URL CSV:', GOOGLE_SHEETS_CSV_URL);
+      console.log('Iniciando carga de datos...');
+      console.log('URL CSV:', GOOGLE_SHEETS_CSV_URL);
       
       Papa.parse(GOOGLE_SHEETS_CSV_URL, {
         download: true,
         header: true,
         complete: function(results) {
-          console.log('✅ Datos recibidos:', results.data.length, 'filas');
-          console.log('📋 Primera fila:', results.data[0]);
+          console.log('Datos recibidos:', results.data.length, 'filas');
+          console.log('Primera fila:', results.data[0]);
           procesarDatos(results.data);
         },
         error: function(error) {
-          console.error('❌ Error al cargar:', error);
+          console.error('Error al cargar:', error);
           document.getElementById('productos-container').innerHTML = 
-            '<div class="loader">ERROR: No se pudo cargar el catálogo. Verifica la consola (F12)</div>';
+            '<div class="loader">ERROR: No se pudo cargar el catalogo</div>';
           document.getElementById('categorias-menu').innerHTML = 
             '<div class="loader">ERROR DE CARGA</div>';
         }
@@ -585,33 +583,32 @@
     }
     
     function procesarDatos(datos) {
-      console.log('🔄 Procesando', datos.length, 'filas...');
-      const productos = {};
-      let procesados = 0;
+      console.log('Procesando', datos.length, 'filas...');
+      var productos = {};
+      var procesados = 0;
       
-      // Agrupar productos por nombre + color
-      datos.forEach(row => {
-        // Validar que tenga al menos nombre y categoría
+      for (var i = 0; i < datos.length; i++) {
+        var row = datos[i];
+        
         if (!row['Nombre del artículo'] || !row['Categoría']) {
-          console.log('⚠️ Fila sin nombre o categoría, saltando:', row);
-          return;
+          console.log('Fila sin nombre o categoria, saltando:', row);
+          continue;
         }
         
-        const key = row['Nombre del artículo'] + '_' + (row['Color'] || '');
+        var key = row['Nombre del artículo'] + '_' + (row['Color'] || '');
         
         if (!productos[key]) {
           productos[key] = {
-            nombre: row['Nombre del artículo'],
+            nombre: row['Nombre del artículo'] || '',
             color: row['Color'] || '',
-            categoria: row['Categoría'],
+            categoria: row['Categoría'] || '',
             costo: parseFloat(row['Costo']) || 0,
             precio: parseFloat(row['Precio venta']) || 0,
-            descripcion: row['Descripción'] || 'Sin descripción',
+            descripcion: row['Descripción'] || 'Sin descripcion',
             imagenes: []
           };
         }
         
-        // Agregar imagen
         if (row['Imagen (URL Drive)']) {
           productos[key].imagenes.push({
             numero: parseInt(row['Número de imagen']) || 1,
@@ -619,20 +616,21 @@
           });
         }
         procesados++;
-      });
+      }
       
-      // Convertir a array y ordenar imágenes
       todosLosProductos = Object.values(productos);
-      todosLosProductos.forEach(p => {
-        p.imagenes.sort((a, b) => a.numero - b.numero);
-      });
+      for (var j = 0; j < todosLosProductos.length; j++) {
+        todosLosProductos[j].imagenes.sort(function(a, b) {
+          return a.numero - b.numero;
+        });
+      }
       
-      console.log('✅ Productos procesados:', todosLosProductos.length);
-      console.log('📦 Primer producto:', todosLosProductos[0]);
+      console.log('Productos procesados:', todosLosProductos.length);
+      console.log('Primer producto:', todosLosProductos[0]);
       
       if (todosLosProductos.length === 0) {
         document.getElementById('productos-container').innerHTML = 
-          '<div class="loader">⚠️ No se encontraron productos válidos. Verifica los nombres de las columnas en Google Sheets.</div>';
+          '<div class="loader">No se encontraron productos validos</div>';
         document.getElementById('categorias-menu').innerHTML = 
           '<div class="loader">SIN DATOS</div>';
         return;
@@ -642,81 +640,109 @@
       mostrarProductos(todosLosProductos);
     }
     
-    // ==========================================
-    // CATEGORÍAS
-    // ==========================================
     function cargarCategorias() {
-      const categorias = [...new Set(todosLosProductos.map(p => p.categoria))].sort();
-      const menu = document.getElementById('categorias-menu');
+      var categoriasSet = {};
+      for (var i = 0; i < todosLosProductos.length; i++) {
+        categoriasSet[todosLosProductos[i].categoria] = true;
+      }
+      var categorias = Object.keys(categoriasSet).sort();
+      
+      var menu = document.getElementById('categorias-menu');
       menu.innerHTML = '';
       
-      // Botón TODOS
-      const btnTodos = document.createElement('div');
+      var btnTodos = document.createElement('div');
       btnTodos.className = 'categoria-item active';
-      btnTodos.textContent = '🎯 TODOS';
+      btnTodos.textContent = 'TODOS';
       btnTodos.onclick = function() { filtrarPorCategoria('TODOS'); };
       menu.appendChild(btnTodos);
       
-      // Botones de categorías
-      categorias.forEach(cat => {
-        const btn = document.createElement('div');
+      for (var j = 0; j < categorias.length; j++) {
+        var cat = categorias[j];
+        var btn = document.createElement('div');
         btn.className = 'categoria-item';
         btn.textContent = cat;
-        btn.onclick = function() { filtrarPorCategoria(cat); };
+        btn.setAttribute('data-categoria', cat);
+        btn.onclick = (function(categoria) {
+          return function() { filtrarPorCategoria(categoria); };
+        })(cat);
         menu.appendChild(btn);
-      });
+      }
       
-      console.log('✅ Categorías cargadas:', categorias.length);
+      console.log('Categorias cargadas:', categorias.length);
     }
     
     function filtrarPorCategoria(categoria) {
       document.getElementById('categoria-actual').textContent = 
         categoria === 'TODOS' ? 'TODOS LOS PRODUCTOS' : categoria;
       
-      document.querySelectorAll('.categoria-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      event.target.classList.add('active');
+      var items = document.querySelectorAll('.categoria-item');
+      for (var i = 0; i < items.length; i++) {
+        items[i].classList.remove('active');
+        if ((categoria === 'TODOS' && items[i].textContent === 'TODOS') ||
+            items[i].textContent === categoria) {
+          items[i].classList.add('active');
+        }
+      }
       
-      const filtrados = categoria === 'TODOS' ? 
-        todosLosProductos : 
-        todosLosProductos.filter(p => p.categoria === categoria);
-      
-      mostrarProductos(filtrados);
+      if (categoria === 'TODOS') {
+        mostrarProductos(todosLosProductos);
+      } else {
+        var filtrados = [];
+        for (var j = 0; j < todosLosProductos.length; j++) {
+          if (todosLosProductos[j].categoria === categoria) {
+            filtrados.push(todosLosProductos[j]);
+          }
+        }
+        mostrarProductos(filtrados);
+      }
     }
     
-    // ==========================================
-    // MOSTRAR PRODUCTOS
-    // ==========================================
     function mostrarProductos(productos) {
-      const container = document.getElementById('productos-container');
+      var container = document.getElementById('productos-container');
       
       if (productos.length === 0) {
         container.innerHTML = '<div class="loader">NO HAY PRODUCTOS</div>';
         return;
       }
       
-      let html = '';
-      productos.forEach((producto, index) => {
-        const img = producto.imagenes[0]?.url || '';
-        const nombreSeguro = producto.nombre.replace(/'/g, '&#39;');
-        html += `
-          <div class="producto-card" onclick="abrirModal(${index})">
-            <img src="${img}" alt="${nombreSeguro}" class="producto-imagen" 
-                 onerror="this.src='https://via.placeholder.com/280x220/0a0a0a/00ff6a?text=Sin+Imagen'">
-            <div class="producto-nombre">${producto.nombre}</div>
-            <div class="producto-precio">${formatearPrecio(producto.precio)}</div>
-          </div>
-        `;
-      });
+      container.innerHTML = '';
       
-      container.innerHTML = html;
-      console.log('✅ Productos mostrados:', productos.length);
+      for (var i = 0; i < productos.length; i++) {
+        var producto = productos[i];
+        var index = todosLosProductos.indexOf(producto);
+        
+        var card = document.createElement('div');
+        card.className = 'producto-card';
+        card.setAttribute('data-index', index);
+        card.onclick = (function(idx) {
+          return function() { abrirModal(idx); };
+        })(index);
+        
+        var img = document.createElement('img');
+        img.className = 'producto-imagen';
+        img.src = producto.imagenes[0] ? producto.imagenes[0].url : '';
+        img.alt = producto.nombre;
+        img.onerror = function() {
+          this.src = 'https://via.placeholder.com/280x220/0a0a0a/00ff6a?text=Sin+Imagen';
+        };
+        
+        var nombre = document.createElement('div');
+        nombre.className = 'producto-nombre';
+        nombre.textContent = producto.nombre;
+        
+        var precio = document.createElement('div');
+        precio.className = 'producto-precio';
+        precio.textContent = '$' + formatearPrecio(producto.precio);
+        
+        card.appendChild(img);
+        card.appendChild(nombre);
+        card.appendChild(precio);
+        container.appendChild(card);
+      }
+      
+      console.log('Productos mostrados:', productos.length);
     }
     
-    // ==========================================
-    // MODAL Y CARRUSEL
-    // ==========================================
     function abrirModal(index) {
       productoActual = todosLosProductos[index];
       imagenActualIndex = 0;
@@ -724,80 +750,7 @@
       document.getElementById('modal-nombre').textContent = productoActual.nombre;
       document.getElementById('modal-color').textContent = productoActual.color;
       document.getElementById('modal-categoria').textContent = productoActual.categoria;
-      document.getElementById('modal-precio').textContent = '
-      
-      actualizarCarrusel();
-      crearIndicadores();
-      
-      document.getElementById('modal').classList.add('active');
-    }
-    
-    function cerrarModal() {
-      document.getElementById('modal').classList.remove('active');
-    }
-    
-    function cambiarImagen(direccion) {
-      if (!productoActual) return;
-      
-      imagenActualIndex += direccion;
-      
-      if (imagenActualIndex < 0) {
-        imagenActualIndex = productoActual.imagenes.length - 1;
-      } else if (imagenActualIndex >= productoActual.imagenes.length) {
-        imagenActualIndex = 0;
-      }
-      
-      actualizarCarrusel();
-    }
-    
-    function irAImagen(index) {
-      imagenActualIndex = index;
-      actualizarCarrusel();
-    }
-    
-    function actualizarCarrusel() {
-      if (!productoActual || !productoActual.imagenes[imagenActualIndex]) return;
-      
-      document.getElementById('carrusel-imagen').src = productoActual.imagenes[imagenActualIndex].url;
-      
-      document.querySelectorAll('.indicador').forEach((ind, i) => {
-        ind.classList.toggle('active', i === imagenActualIndex);
-      });
-    }
-    
-    function crearIndicadores() {
-      const container = document.getElementById('carrusel-indicadores');
-      let html = '';
-      
-      productoActual.imagenes.forEach((img, i) => {
-        html += `<span class="indicador ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})"></span>`;
-      });
-      
-      container.innerHTML = html;
-    }
-    
-    // ==========================================
-    // UTILIDADES
-    // ==========================================
-    function formatearPrecio(precio) {
-      return Number(precio).toLocaleString('es-AR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
-    
-    // Cerrar modal con ESC
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') cerrarModal();
-    });
-    
-    // Cerrar modal al hacer click fuera
-    document.getElementById('modal').addEventListener('click', function(e) {
-      if (e.target === this) cerrarModal();
-    });
-  </script>
-</body>
-</html> + formatearPrecio(productoActual.precio);
+      document.getElementById('modal-precio').textContent = '$' + formatearPrecio(productoActual.precio);
       document.getElementById('modal-descripcion').textContent = productoActual.descripcion;
       
       actualizarCarrusel();
@@ -834,41 +787,40 @@
       
       document.getElementById('carrusel-imagen').src = productoActual.imagenes[imagenActualIndex].url;
       
-      document.querySelectorAll('.indicador').forEach((ind, i) => {
-        ind.classList.toggle('active', i === imagenActualIndex);
-      });
+      var indicadores = document.querySelectorAll('.indicador');
+      for (var i = 0; i < indicadores.length; i++) {
+        if (i === imagenActualIndex) {
+          indicadores[i].classList.add('active');
+        } else {
+          indicadores[i].classList.remove('active');
+        }
+      }
     }
     
     function crearIndicadores() {
-      const container = document.getElementById('carrusel-indicadores');
-      let html = '';
+      if (!productoActual) return;
       
-      productoActual.imagenes.forEach((img, i) => {
-        html += `<span class="indicador ${i === 0 ? 'active' : ''}" onclick="irAImagen(${i})"></span>`;
-      });
+      var container = document.getElementById('carrusel-indicadores');
+      container.innerHTML = '';
       
-      container.innerHTML = html;
+      for (var i = 0; i < productoActual.imagenes.length; i++) {
+        var indicador = document.createElement('span');
+        indicador.className = 'indicador';
+        if (i === 0) indicador.classList.add('active');
+        indicador.setAttribute('data-index', i);
+        indicador.onclick = (function(idx) {
+          return function() { irAImagen(idx); };
+        })(i);
+        container.appendChild(indicador);
+      }
     }
     
-    // ==========================================
-    // UTILIDADES
-    // ==========================================
     function formatearPrecio(precio) {
       return Number(precio).toLocaleString('es-AR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       });
     }
-    
-    // Cerrar modal con ESC
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') cerrarModal();
-    });
-    
-    // Cerrar modal al hacer click fuera
-    document.getElementById('modal').addEventListener('click', function(e) {
-      if (e.target === this) cerrarModal();
-    });
   </script>
 </body>
 </html>
