@@ -648,14 +648,24 @@
     function cargarCategorias() {
       const categorias = [...new Set(todosLosProductos.map(p => p.categoria))].sort();
       const menu = document.getElementById('categorias-menu');
+      menu.innerHTML = '';
       
-      let html = '<div class="categoria-item active" onclick="filtrarPorCategoria(\'TODOS\')">🎯 TODOS</div>';
+      // Botón TODOS
+      const btnTodos = document.createElement('div');
+      btnTodos.className = 'categoria-item active';
+      btnTodos.textContent = '🎯 TODOS';
+      btnTodos.onclick = function() { filtrarPorCategoria('TODOS'); };
+      menu.appendChild(btnTodos);
+      
+      // Botones de categorías
       categorias.forEach(cat => {
-        const catEscapada = cat.replace(/'/g, "\\'");
-        html += `<div class="categoria-item" onclick="filtrarPorCategoria('${catEscapada}')">${cat}</div>`;
+        const btn = document.createElement('div');
+        btn.className = 'categoria-item';
+        btn.textContent = cat;
+        btn.onclick = function() { filtrarPorCategoria(cat); };
+        menu.appendChild(btn);
       });
       
-      menu.innerHTML = html;
       console.log('✅ Categorías cargadas:', categorias.length);
     }
     
